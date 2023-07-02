@@ -1,0 +1,17 @@
+{
+    "name": "HikingGame.Control",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b96b99ec7b1cabd47b788997cdf410d9",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,27 +1,32 @@
+using Blyman94.CommonSolutions;
 using Cinemachine;
 using System.Collections;
 using UnityEngine;
 
 namespace HikingGame.Climbing
 {
+    public delegate void Complete();
+
     /// <summary>
     /// A camera dolly sequence that makes the player appear to be climbing over 
     /// a rock.
     /// </summary>
     public class ClimbingCameraSequence : MonoBehaviour
     {
+        public Complete Complete;
+
         [Header("Component References")]
         [SerializeField] private CinemachineVirtualCamera _climbingCamera;
         [SerializeField] private CinemachineDollyCart _climbingDollyCart;
         [SerializeField] private CinemachineSmoothPath _climbingDollyTrack;
         [SerializeField] private Transform _lookTarget;
-        
+
         [Header("Sequence Parameters")]
-        [Tooltip("Should the player look at their hand positions " + 
+        [Tooltip("Should the player look at their hand positions " +
             "before climbing?")]
         [SerializeField] private bool _playLookSequence = true;
 
-        [Tooltip("How quickly should the player looks at their hand " + 
+        [Tooltip("How quickly should the player looks at their hand " +
             "positions?")]
         [SerializeField] private float _lookSpeed;
 
@@ -37,58 +42,73 @@ namespace HikingGame.Climbing
         [Tooltip("Curve describing the camera's speed throughout the ascent.")]
         [SerializeField] private AnimationCurve _climbSpeedCurve;
 
+        [Header("Events")]
+        [SerializeField] private GameEvent _removePlayerControlEvent;
+        [SerializeField] private GameEvent _restorePlayerControlEvent;
+
         #region MonoBehaviour Methods
         private void Awake()
         {
             _climbingDollyCart.m_PositionUnits =
                 CinemachinePathBase.PositionUnits.Normalized;
+            _climbingCamera.Priority = 0;
         }
         #endregion
 
-        public void Run(Vector3 lookTargetStartPos, Vector3 lookForwardPos, 
-            Vector3 lookLeftPos, Vector3 lookRightPos)
+        public void Reset()
         {
-            StartCoroutine(ClimbingCameraRoutine(lookTargetStartPos, 
-                lookForwardPos, lookLeftPos, lookRightPos));
+            _climbingDollyCart.m_Position = 0.0f;
+            _climbingDollyCart.m_Speed = 0.0f;
         }
 
-        private IEnumerator ClimbingCameraRoutine(Vector3 lookTargetStartPos, 
-            Vector3 lookForwardPos, Vector3 lookLeftPos, Vector3 lookRightPos)
+        public void Run(Vector3 lookTargetStartPos, Vector3 lookForwardPos,
+            Vector3 lookPosA, Vector3 lookPosB)
         {
+            StartCoroutine(ClimbingCameraRoutine(lookTargetStartPos,
+                lookForwardPos, lookPosA, lookPosB));
+        }
+
+        private IEnumerator ClimbingCameraRoutine(Vector3 lookTargetStartPos,
+            Vector3 lookForwardPos, Vector3 lookPosA, Vector3 lookPosB)
+        {
+            _removePlayerControlEvent.Raise();
+
+            float step = _lookSpeed * Time.deltaTime;
+
             _lookTarget.position = lookTargetStartPos;
             _climbingCamera.LookAt = _lookTarget;
+            _climbingCamera.Priority = 100;
 
             if (_playLookSequence)
             {
-                float step = _lookSpeed * Time.deltaTime;
                 while (Vector3.Distance(_lookTarget.position,
-                lookRightPos) >= 0.001f)
+                    lookPosA) >= 0.001f)
                 {
                     _lookTarget.transform.position =
                         Vector3.MoveTowards(_lookTarget.transform.position,
-                        lookRightPos, step);
+                        lookPosA, step);
                     yield return null;
                 }
                 yield return new WaitForSeconds(_timeBetweenLooks);
 
                 while (Vector3.Distance(_lookTarget.position,
-                    lookLeftPos) >= 0.001f)
+                lookPosB) >= 0.001f)
                 {
                     _lookTarget.transform.position =
                         Vector3.MoveTowards(_lookTarget.transform.position,
-                        lookLeftPos, step);
+                        lookPosB, step);
                     yield return null;
                 }
                 yield return new WaitForSeconds(_timeBetweenLooks);
+            }
 
-                while (Vector3.Distance(_lookTarget.position,
+            while (Vector3.Distance(_lookTarget.position,
                     lookForwardPos) >= 0.001f)
-                {
-                    _lookTarget.transform.position =
-                        Vector3.MoveTowards(_lookTarget.transform.position,
-                        lookForwardPos, step);
-                    yield return null;
-                }
+            {
+                _lookTarget.transform.position =
+                    Vector3.MoveTowards(_lookTarget.transform.position,
+                    lookForwardPos, step);
+                yield return null;
             }
 
             yield return new WaitForSeconds(_climbAnticipationTime);
@@ -100,6 +120,12 @@ namespace HikingGame.Climbing
                     _climbSpeedCurve.Evaluate(_climbingDollyCart.m_Position) * _climbSpeedMultiplier;
                 yield return null;
             }
+            
+            _climbingCamera.Priority = 0;
+
+            _restorePlayerControlEvent.Raise();
+
+            Complete?.Invoke();
         }
     }
 }

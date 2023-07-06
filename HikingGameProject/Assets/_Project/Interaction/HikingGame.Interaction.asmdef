@@ -1,0 +1,16 @@
+{
+    "name": "HikingGame.Interaction",
+    "rootNamespace": "",
+    "references": [
+        "GUID:734a9ffb7725f4249a27a8f3cbe67f6d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

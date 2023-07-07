@@ -2,7 +2,8 @@
     "name": "HikingGame.Interaction",
     "rootNamespace": "",
     "references": [
-        "GUID:734a9ffb7725f4249a27a8f3cbe67f6d"
+        "GUID:734a9ffb7725f4249a27a8f3cbe67f6d",
+        "GUID:e967c6255d75c8141802a1e4722f1cc0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

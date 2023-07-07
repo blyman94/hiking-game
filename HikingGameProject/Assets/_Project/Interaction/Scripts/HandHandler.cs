@@ -13,40 +13,30 @@ namespace HikingGame.Interaction
         [SerializeField] private GameObject _handLeftPrefab;
         [SerializeField] private GameObject _handRightPrefab;
 
-        private GameObject _handLeft;
-        private GameObject _handRight;
-        private GameObject _currentActiveHand;
-        private GameObject _newActiveHand;
+        private Hand _handLeft;
+        private Hand _handRight;
+        private Hand _currentActiveHand;
+        private Hand _newActiveHand;
 
-        private bool _handLeftPlaced = false;
-        private bool _handRightPlaced = false;
 
         #region MonoBehaviour Methods
         private void Awake()
         {
-            _handLeft = Instantiate(_handLeftPrefab);
-            _handRight = Instantiate(_handRightPrefab);
+            _handLeft = Instantiate(_handLeftPrefab).GetComponent<Hand>();
+            _handRight = Instantiate(_handRightPrefab).GetComponent<Hand>();
             HideHands();
         }
         #endregion
-
-        public void Reset()
-        {
-            _handLeftPlaced = false;
-            _handRightPlaced = false;
-            _currentActiveHand = null;
-            HideHands();
-        }
 
         public void OnHandPlaced()
         {
             if (_currentActiveHand == _handLeft)
             {
-                _handLeftPlaced = true;
+                _handLeft.Place();
             }
             else if (_currentActiveHand == _handRight)
             {
-                _handRightPlaced = true;
+                _handRight.Place();
             }
             _currentActiveHand = null;
         }
@@ -56,8 +46,8 @@ namespace HikingGame.Interaction
             SetActiveHand(targetPosition);
             if (_currentActiveHand != null)
             {
-                _currentActiveHand.transform.position = targetPosition;
-                RotateHand(targetPosition, targetNormal);
+                _currentActiveHand.Move(targetPosition);
+                _currentActiveHand.Rotate(transform,targetPosition);
             }
         }
         public void OnHoverEnd()
@@ -66,10 +56,10 @@ namespace HikingGame.Interaction
             {
                 return;
             }
-            if ((_currentActiveHand == _handLeft && !_handLeftPlaced) ||
-                _currentActiveHand == _handRight && !_handRightPlaced)
+            if ((_currentActiveHand == _handLeft && !_handLeft.Placed) ||
+                _currentActiveHand == _handRight && !_handRight.Placed)
             {
-                _currentActiveHand.SetActive(false);
+                _currentActiveHand.Hide();
             }
             _currentActiveHand = null;
         }
@@ -78,56 +68,49 @@ namespace HikingGame.Interaction
         {
             if (hand == HandType.Left)
             {
-                _handLeft.transform.position = targetPosition;
+                _handLeft.Move(targetPosition);
             }
             else if (hand == HandType.Right)
             {
-                _handRight.transform.position = targetPosition;
+                _handRight.Move(targetPosition);
             }
-        }
-
-        private void RotateHand(Vector3 targetPosition, Vector3 targetNormal)
-        {
-            var lookPos = transform.position - _currentActiveHand.transform.position;
-            var rotation = Quaternion.LookRotation(-lookPos);
-            _currentActiveHand.transform.rotation = rotation;
         }
 
         private void HideHands()
         {
-            _handLeft.SetActive(false);
-            _handRight.SetActive(false);
+            _handLeft.Hide();
+            _handRight.Hide();
         }
 
         private void SetActiveHand(Vector3 targetPosition)
         {
-            if (_handLeftPlaced && _handRightPlaced)
+            if (_handLeft.Placed && _handRight.Placed)
             {
                 return;
             }
             if (_playerOrientation.IsToLeft(targetPosition))
             {
-                if (_handLeftPlaced)
+                if (_handLeft.Placed)
                 {
-                    _handRight.SetActive(true);
+                    _handRight.Show();
                     _newActiveHand = _handRight;
                 }
                 else
                 {
-                    _handLeft.SetActive(true);
+                    _handLeft.Show();
                     _newActiveHand = _handLeft;
                 }
             }
             else
             {
-                if (_handRightPlaced)
+                if (_handRight.Placed)
                 {
-                    _handLeft.SetActive(true);
+                    _handLeft.Show();
                     _newActiveHand = _handLeft;
                 }
                 else
                 {
-                    _handRight.SetActive(true);
+                    _handRight.Show();
                     _newActiveHand = _handRight;
                 }
             }
@@ -136,10 +119,10 @@ namespace HikingGame.Interaction
             {
                 if (_currentActiveHand != null)
                 {
-                    _currentActiveHand.SetActive(false);
+                    _currentActiveHand.Hide();
                 }
                 _currentActiveHand = _newActiveHand;
-                _currentActiveHand.SetActive(true);
+                _currentActiveHand.Show();
             }
         }
     }

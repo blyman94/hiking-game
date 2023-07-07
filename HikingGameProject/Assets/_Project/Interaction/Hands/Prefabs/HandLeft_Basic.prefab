@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4719088312915358256}
+  - component: {fileID: -6347482819769434203}
   m_Layer: 0
   m_Name: HandLeft_Basic
   m_TagString: Untagged
@@ -32,6 +33,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6347482819769434203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4719088312915358258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66fac0978c9c2e641827752ec8a0d848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxDistanceFromChest: 1
+  _graphics: {fileID: 5113600621883896258}
+  _animator: {fileID: 851747273}
+  _playerChestPosition: {fileID: 11400000, guid: 56f469d6a270afe46ae13869ebda9182,
+    type: 2}
 --- !u!1001 &4719088312733029929
 PrefabInstance:
   m_ObjectHideFlags: 0

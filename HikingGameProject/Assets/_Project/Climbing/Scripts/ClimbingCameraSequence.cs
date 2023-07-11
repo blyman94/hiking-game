@@ -46,6 +46,9 @@ namespace HikingGame.Climbing
         [SerializeField] private GameEvent _removePlayerControlEvent;
         [SerializeField] private GameEvent _restorePlayerControlEvent;
 
+        // TODO: Determine if this is necessary.
+        private CinemachineSmoothPath.Waypoint _originalDollyTrackStartPosition;
+
         #region MonoBehaviour Methods
         private void Awake()
         {
@@ -59,6 +62,9 @@ namespace HikingGame.Climbing
         {
             _climbingDollyCart.m_Position = 0.0f;
             _climbingDollyCart.m_Speed = 0.0f;
+            
+            // TODO: Remove this if it's not necessary.
+            ResetDollyTrackStartPosition();
         }
 
         public void Run(Vector3 lookTargetStartPos, Vector3 lookForwardPos,
@@ -66,6 +72,26 @@ namespace HikingGame.Climbing
         {
             StartCoroutine(ClimbingCameraRoutine(lookTargetStartPos,
                 lookForwardPos, lookPosA, lookPosB));
+        }
+
+        public void SetDollyTrackStartXPosition(float xPos)
+        {
+            _originalDollyTrackStartPosition = _climbingDollyTrack.m_Waypoints[0];
+            CinemachineSmoothPath.Waypoint newStartPosition =
+                new CinemachineSmoothPath.Waypoint();
+
+            newStartPosition.position = new Vector3(xPos, 
+                _originalDollyTrackStartPosition.position.y,
+                _originalDollyTrackStartPosition.position.z);
+                
+            _climbingDollyTrack.m_Waypoints[0] = newStartPosition;
+        }
+
+        private void ResetDollyTrackStartPosition()
+        {
+            // TODO: Remove this if it's not necessary.
+            _climbingDollyTrack.m_Waypoints[0] = 
+                _originalDollyTrackStartPosition;
         }
 
         private IEnumerator ClimbingCameraRoutine(Vector3 lookTargetStartPos,
@@ -120,7 +146,7 @@ namespace HikingGame.Climbing
                     _climbSpeedCurve.Evaluate(_climbingDollyCart.m_Position) * _climbSpeedMultiplier;
                 yield return null;
             }
-            
+
             _climbingCamera.Priority = 0;
 
             _restorePlayerControlEvent.Raise();

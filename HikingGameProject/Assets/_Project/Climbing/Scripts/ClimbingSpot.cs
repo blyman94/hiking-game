@@ -1,3 +1,4 @@
+using HikingGame.Common;
 using Blyman94.CommonSolutions;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace HikingGame.Climbing
         private Vector3 _firstHandPosition;
         private Vector3 _secondHandPosition;
         private Transform _playerTransform;
+        private Transform _playerOrientation;
 
         #region MonoBehaviour Methods
         private void Awake()
@@ -47,6 +49,8 @@ namespace HikingGame.Climbing
                 {
                     climbingRock.PlayerInClimbingSpot = true;
                     _playerTransform = other.transform;
+                    _playerOrientation = 
+                        _playerTransform.GetComponentInChildren<PlayerOrientation>().transform;
                 }
                 _climbingCameraSequence.Reset();
             }
@@ -91,6 +95,12 @@ namespace HikingGame.Climbing
                         _secondHandPosition = climbingRock.InteractPosition;
                     }
                 }
+
+                // Calculate new start point
+                Vector3 firstHandRelativePos = _playerOrientation.InverseTransformPoint(_firstHandPosition);
+                Vector3 secondHandRelativePos = _playerOrientation.InverseTransformPoint(_secondHandPosition);
+                float xPos = (firstHandRelativePos.x + _secondHandPosition.x) * 0.5f;
+                _climbingCameraSequence.SetDollyTrackStartXPosition(xPos);
 
                 Vector3 lookForwardPos = (_firstHandPosition + _secondHandPosition) * 0.5f;
                 _climbingCameraSequence.Run(_secondHandPosition, lookForwardPos, _firstHandPosition, _secondHandPosition);

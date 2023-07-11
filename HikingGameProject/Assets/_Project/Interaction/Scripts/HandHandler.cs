@@ -1,3 +1,4 @@
+using HikingGame.Common;
 using UnityEngine;
 
 namespace HikingGame.Interaction
